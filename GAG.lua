@@ -190,7 +190,6 @@ end
 
 createWindow("Velonix-GaG", 28)
 createLogo(121332021347640)
-createOpen(121332021347640)
 
 -- Home Tab
 createTab("Home", 1)

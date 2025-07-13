@@ -97,7 +97,7 @@ end
 -- UI
 createWindow("Velonix Universal", 28)
 createLogo(121332021347640)
-createOpen(121332021347640)
+
 createTab("Player", 1)
 createToggle("Aim Assist", 1, false, function(state)
 	if state then AssistOn() else AssistOff() end

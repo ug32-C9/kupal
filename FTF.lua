@@ -91,7 +91,6 @@ end
 -- Windows
 createWindow("Velonix Hub", 28)
 createLogo(121332021347640)
-createOpen(121332021347640)
 
 -- Tabs
 createTab("Home", 1)
