@@ -173,6 +173,7 @@ end
 -- UI Integration
 createWindow("Velonix-TSB", 28)
 createLogo(121332021347640)
+createOpen(121332021347640)
 
 createTab("Home", 1)
 createLabel("Credits: Founder: itzC9", 1)

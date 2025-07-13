@@ -1,7 +1,8 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ug32-C9/Velonix-UI-Library/refs/heads/main/Main3.lua"))()
 
 createWindow("Velonix Hub", 28)
-createLogo(12345678)
+createLogo(121332021347640)
+createOpen(121332021347640)
 
 -- Home
 createTab("Home", 1)
