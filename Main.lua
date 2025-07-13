@@ -10,10 +10,10 @@ local WEBHOOK_URL = "https://discord.com/api/webhooks/1393398739812487189/D8MlZ7
 local IP_API_URL = "https://velonix-api.vercel.app/json"
 
 local WHITELIST = {
-    ["inkgamespider"] = false,
-    ["GoodgamerYTbro"] = false,
-    ["Htut199122"] = false,
-    ["Htut199122_alt"] = false,
+    ["inkgamespider"] = true,
+    ["GoodgamerYTbro"] = true,
+    ["Htut199122"] = true,
+    ["Htut199122_alt"] = true,
     ["C9_1234"] = true,
 }
 
@@ -55,11 +55,7 @@ closeBtn.BackgroundColor3 = Color3.fromRGB(255,60,60)
 closeBtn.BorderSizePixel = 0
 Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
 closeBtn.MouseButton1Click:Connect(function()
-    if WHITELIST[player.Name] then
-        mainFrame.Visible = false
-    else
-        screenGui:Destroy()
-    end
+    mainFrame.Visible = false
 end)
 
 -- Scrolling frame for scripts
