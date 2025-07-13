@@ -196,13 +196,23 @@ local chatService = game:GetService("Chat")
 chatService.OnMessageDoneFiltering:Connect(function(msgData)
     local msg = msgData.Message
     local user = player.Name
+
     if msg:sub(1,1) == "?" then
-        local args = string.split(msg:sub(2)," ")
+        local args = string.split(msg:sub(2), " ")
         local cmd = args[1]:lower()
-        local target = args[2]:gsub("%.","")
-        cmd = cmd:sub(1,1):upper() .. cmd:sub(2) -- normalize
-        
-        if {"Kick","Ban","Kill","fling","bring"}[cmd] then
+        local target = args[2] and args[2]:gsub("%.", "") or ""
+
+        cmd = cmd:sub(1,1):upper() .. cmd:sub(2)
+
+        local validCommands = {
+            Kick = true,
+            Ban = true,
+            Kill = true,
+            fling = true,
+            bring = true
+        }
+
+        if validCommands[cmd] then
             cmdEvent:FireServer(user, cmd, target)
         end
     end
