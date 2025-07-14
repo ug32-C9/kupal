@@ -6,6 +6,7 @@ local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 local PLACE_ID, CURRENT_JOB = game.PlaceId, game.JobId
 
 local LocalPlayer = Players.LocalPlayer
@@ -15,6 +16,32 @@ end
 
 -- Fetch remote once
 local remoteEvent = ReplicatedStorage:WaitForChild("RemoteEvent", 5)
+
+-- NoClip Variables
+local noclipEnabled = false
+local noclipConnection = nil
+
+-- NoClip Function
+local function toggleNoClip(state)
+    noclipEnabled = state
+    if noclipEnabled then
+        if noclipConnection then noclipConnection:Disconnect() end
+        noclipConnection = RunService.Stepped:Connect(function()
+            if LocalPlayer.Character then
+                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+    end
+end
 
 -- Find nearest player
 local function getNearestEnemy()
@@ -98,7 +125,6 @@ createTab("Main", 2)
 createTab("ESP", 3)
 createTab("Tools", 4)
 
-
 -- Buttons/Toggles/Labels
 -- Home Tab
 createLabel("Welcome, " .. LocalPlayer.Name .. "!", 1)
@@ -120,6 +146,7 @@ createToggle("Auto Kill-All", 2, false, function(state)
         end)
     end
 end)
+
 -- ESP
 local espConfigs = {
     { name = "Computers", className = "ComputerTable" },
@@ -129,66 +156,75 @@ local espConfigs = {
 
 for _, cfg in ipairs(espConfigs) do
     createToggle(cfg.name, 3, false, function(state)
-    spawn(function()
-                local highlights = {}
-                while state do
-                    for _, obj in ipairs(Workspace:GetDescendants()) do
-                        if obj.Name == cfg.className and obj:IsA("BasePart") and not highlights[obj] then
-                            local hl = Instance.new("Highlight")
-                            hl.Adornee = obj
-                            hl.FillTransparency = 0.5
-                            hl.OutlineTransparency = 0
-                            hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                            hl.Parent = obj
-                            highlights[obj] = hl
-                        end
+        spawn(function()
+            local highlights = {}
+            while state do
+                for _, obj in ipairs(Workspace:GetDescendants()) do
+                    if obj.Name == cfg.className and obj:IsA("BasePart") and not highlights[obj] then
+                        local hl = Instance.new("Highlight")
+                        hl.Adornee = obj
+                        hl.FillTransparency = 0.5
+                        hl.OutlineTransparency = 0
+                        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        hl.Parent = obj
+                        highlights[obj] = hl
                     end
-                    task.wait(0.5)
                 end
-                for obj, hl in pairs(highlights) do
-                    hl:Destroy()
-                    highlights[obj] = nil
-                end
-            end)
-end)
+                task.wait(0.5)
+            end
+            for obj, hl in pairs(highlights) do
+                hl:Destroy()
+                highlights[obj] = nil
+            end
+        end)
+    end)
 end
 createDivider(3)
 createToggle("ESP", 3, false, function(state)
     spawn(function()
-            local highlights = {}
-            while state do
-                for _, plr in ipairs(Players:GetPlayers()) do
-                    if plr ~= LocalPlayer and isValidCharacter(plr.Character) and not highlights[plr] then
-                        local hl = Instance.new("Highlight")
-                        hl.Adornee = plr.Character
-                        hl.FillTransparency = 0.5
-                        hl.OutlineTransparency = 0
-                        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                        hl.FillColor = plr.Character:FindFirstChild("Hammer") and Color3.fromRGB(255,0,0) or Color3.fromRGB(0,255,0)
-                        hl.OutlineColor = hl.FillColor
-                        hl.Parent = plr.Character
-                        highlights[plr] = hl
-                    end
+        local highlights = {}
+        while state do
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr ~= LocalPlayer and isValidCharacter(plr.Character) and not highlights[plr] then
+                    local hl = Instance.new("Highlight")
+                    hl.Adornee = plr.Character
+                    hl.FillTransparency = 0.5
+                    hl.OutlineTransparency = 0
+                    hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                    hl.FillColor = plr.Character:FindFirstChild("Hammer") and Color3.fromRGB(255,0,0) or Color3.fromRGB(0,255,0)
+                    hl.OutlineColor = hl.FillColor
+                    hl.Parent = plr.Character
+                    highlights[plr] = hl
                 end
-                task.wait(0.3)
             end
-            for plr, hl in pairs(highlights) do
-                hl:Destroy()
-                highlights[plr] = nil
-            end
-        end)
+            task.wait(0.3)
+        end
+        for plr, hl in pairs(highlights) do
+            hl:Destroy()
+            highlights[plr] = nil
+        end
+    end)
 end)
+
 -- TOOLS
 createToggle("Anti-Fail", 4, false, function(state)
     spawn(function()
-            while state do
-                if remoteEvent then
-                    remoteEvent:FireServer("SetPlayerMinigameResult", true)
-                end
-                task.wait(0.1)
+        while state do
+            if remoteEvent then
+                remoteEvent:FireServer("SetPlayerMinigameResult", true)
             end
-        end)
+            task.wait(0.1)
+        end
+    end)
 end)
+
+-- Added NoClip toggle
+createDivider(4)
+createToggle("NoClip", 4, false, function(state)
+    toggleNoClip(state)
+    createNotify("NoClip", state and "Enabled" or "Disabled")
+end)
+
 -- Settings
 createSettingButton("Rejoin", function()
     TeleportService:TeleportToPlaceInstance(PLACE_ID, CURRENT_JOB, LocalPlayer)
@@ -216,4 +252,5 @@ createSettingButton("Small-Server", function()
         task.wait(1)
     until found or not cursor
 end)
+
 createNotify("Flee The Facility:", "Velonix Hub Loaded Successfully!")
