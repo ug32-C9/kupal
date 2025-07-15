@@ -179,7 +179,37 @@ spawn(function()
         end
     end
 end)
-
---// EXECUTE FINAL MAIN SCRIPT
-wait(5)
+wait(2)
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/Admin.lua"))()
+wait(2)
+local owner = 5066278683
+local coOwner = 4688179501
+
+local function displayNotification(userName)
+    game.StarterGui:SetCore("SendNotification", {
+        Title = userName .. " here!",
+        Text = "Developer of Script is on this server",
+        Icon = 'rbxassetid://7247105391',
+        Duration = 10,
+    })
+end
+
+local function checkAndNotify(player)
+    if player.UserId == owner then
+        displayNotification("C9_1234")
+    elseif player.UserId == coOwner then
+        displayNotification("0946is")
+    end
+end
+
+local function checkAllPlayers()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            checkAndNotify(player)
+        end
+    end
+end
+checkAllPlayers()
+game.Players.PlayerAdded:Connect(function(player)
+    checkAndNotify(player)
+end)
