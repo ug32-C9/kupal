@@ -182,34 +182,51 @@ end)
 wait(2)
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/Admin.lua"))()
 wait(2)
-local owner = 5066278683
-local coOwner = 4688179501
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+local SoundService = game:GetService("SoundService")
+local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+
+local DevRoles = {
+    [1489467751] = "C9_1234",       -- Owner
+    [4688179501] = "0947is",        -- Co-Owner
+    [8481531471] = "Nov",           -- Dev 1
+    [3489668970] = "goodGamerYT",   -- Dev 2
+    [8910853649] = "Zero",          -- Dev 3
+}
+
+local function playCheerSound()
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://138087017"
+    sound.Volume = 5
+    sound.Parent = SoundService
+    sound:Play()
+    game:GetService("Debris"):AddItem(sound, 5)
+end
 
 local function displayNotification(userName)
-    game.StarterGui:SetCore("SendNotification", {
-        Title = userName .. " here!",
-        Text = "Developer of Script is on this server",
-        Icon = 'rbxassetid://7247105391',
-        Duration = 10,
-    })
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = userName .. " here!",
+            Text = "Developer of the script is on this server",
+            Icon = 'rbxassetid://7247105391',
+            Duration = 10,
+        })
+    end)
+    playCheerSound()
 end
 
 local function checkAndNotify(player)
-    if player.UserId == owner then
-        displayNotification("C9_1234")
-    elseif player.UserId == coOwner then
-        displayNotification("0946is")
-    end
-end
-
-local function checkAllPlayers()
-    for _, player in pairs(game.Players:GetPlayers()) do
-        if player ~= game.Players.LocalPlayer then
-            checkAndNotify(player)
+    if player ~= LocalPlayer then
+        local devName = DevRoles[player.UserId]
+        if devName then
+            displayNotification(devName)
         end
     end
 end
-checkAllPlayers()
-game.Players.PlayerAdded:Connect(function(player)
+
+for _, player in ipairs(Players:GetPlayers()) do
     checkAndNotify(player)
-end)
+end
+
+Players.PlayerAdded:Connect(checkAndNotify)
