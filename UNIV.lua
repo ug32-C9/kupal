@@ -95,7 +95,7 @@ local function AssistOff()
 end
 
 -- UI
-createWindow("Velonix Universal", 28)
+createWindow("Velonix Hub - Universal", 28)
 createLogo(121332021347640)
 
 createTab("Player", 1)

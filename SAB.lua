@@ -1,6 +1,6 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ug32-C9/Velonix-UI-Library/refs/heads/main/Main3.lua"))()
 
-createWindow("Velonix Hub", 28)
+createWindow("Velonix Hub - SAB", 28)
 createLogo(121332021347640)
 
 

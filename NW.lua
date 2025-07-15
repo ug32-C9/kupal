@@ -1,128 +1,10 @@
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ug32-C9/Velonix-UI-Library/refs/heads/main/Main3.lua"))()
 
-local Window = WindUI:CreateWindow({
-    Title = "Velonix Hub",
-    Icon = "door-open",
-    Author = "itzC9",
-    Folder = "VELONIXHUB",
-    Size = UDim2.fromOffset(580, 460),
-    Transparent = true,
-    Theme = "Dark",
-    SideBarWidth = 200,
-    Background = "rbxassetid://18555523643",
-    HasOutline = false,
-    KeySystem = { 
-        Key = {
-        "VXN-A9F4-LK2B",
-        "VXN-3G7H-M4P9",
-        "VXN-ZX9Q-W4RT",    -- ← Admin key
-        "VXN-M0P9-Q1KL" --- ← Lifetime user
-        },
-        Note = "Velonix-Studio Creation",
-         Thumbnail = {
-             Image = "rbxassetid://18610378548",
-             Title = "Thumbnail"
-         },
-        URL = "https://velonix-scripts.vercel.app/",
-        SaveKey = true,
-    },
-})
+createWindow("Velonix Hub - NW", 28)
+createLogo(12345678)
 
-local Tabs = {
-    Main = Window:Tab({ Title = "Main", Icon = "mouse-pointer-2", Desc = "Main Activity" }),
-    
-    Teleport = Window:Tab({ Title = "Teleport", Icon = "mouse-pointer-2", Desc = "Teleport Activity" }),
-    
-    Player = Window:Tab({ Title = "Player", Icon = "mouse-pointer-2", Desc = "Player Activity" }),
-    
-    Credits = Window:Tab({ Title = "Credits", Icon = "youtube", Desc = "Script Developers" }),
-    
-    WindowTab = Window:Tab({ Title = "Window and File Configuration", Icon = "settings", Desc = "Manage window settings and file configurations." }),
-    
-    ThemeTab = Window:Tab({ Title = "Create Theme", Icon = "palette", Desc = "Design and apply custom themes." }),
-    be = Window:Divider(),
-}
-Window:SelectTab(1)
-
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
-local espRunning = false
-local connections = {}
-local espObjects = {}
-
--- Function for Infinite Ammo
-local function InfiniteAmmo(state)
-    print("Infinite Ammo Feature enabled: " .. tostring(state))
-    if not state then return end
-
-    task.spawn(function()
-        local player = game.Players.LocalPlayer
-        local supported = getgc and debug and debug.getinfo and debug.setupvalue
-
-        if not supported then
-            if Fluent then
-                Fluent:Notify({
-                    Title = "Executor Unsupported",
-                    Content = "Velonix Hub",
-                    SubContent = "Your executor doesn't support memory editing.",
-                    Duration = 5
-                })
-            end
-            return
-        end
-
-        local function findReloadFunction()
-            for _, func in pairs(getgc(true)) do
-                if typeof(func) == "function" and not is_synapse_function(func) then
-                    local info = debug.getinfo(func)
-                    if info and info.name == "reload" then
-                        return func
-                    end
-                end
-            end
-        end
-
-        local function tryPatch()
-            local reloadFunc = findReloadFunction()
-            if reloadFunc then
-                for i = 1, 10 do
-                    local val = debug.getupvalue(reloadFunc, i)
-                    if type(val) == "number" and val <= 100 then
-                        print("🔫 Ammo override applied at upvalue index:", i)
-                        debug.setupvalue(reloadFunc, i, math.huge)
-                        return true
-                    end
-                end
-            end
-            return false
-        end
-
-        -- Main retry logic: Try after 1st, 2nd, and 3rd bullet
-        for attempt = 1, 3 do
-            local success = tryPatch()
-            if success then
-                break
-            else
-                warn("🔁 Retry InfiniteAmmo attempt: " .. attempt)
-                task.wait(1.2) -- Give time for shot to fire and func to GC
-            end
-        end
-
-        if Fluent then
-            Fluent:Notify({
-                Title = "Velonix Hub",
-                Content = "Ammo Hook Complete",
-                SubContent = "Infinite Ammo applied or max retry reached.",
-                Duration = 4
-            })
-        end
-    end)
-end
-
--- ESP
-function ESP(state)
-    if state then
+function ESP(s)
+    if s then
         if espRunning then return end
         espRunning = true
 
@@ -201,34 +83,8 @@ function ESP(state)
     end
 end
 
--- Function for Kill Enemy
-local function KillEnemy()
-    print("Kill Enemy Feature enabled")
-    
-    if KillEnemy then
-        spawn(function()
-            while wait(0.1) do
-                local character = LocalPlayer.Character
-
-                if character and character:FindFirstChild("Humanoid") then
-                    for _, v in pairs(game.Workspace:GetDescendants()) do
-                        if v:IsA("Humanoid") and v.Parent and v.Parent:FindFirstChild("HumanoidRootPart") then
-                            local targetPlayer = game.Players:GetPlayerFromCharacter(v.Parent)
-                            if targetPlayer and targetPlayer.Team ~= LocalPlayer.Team then
-                                local Event = game:GetService("ReplicatedStorage"):WaitForChild("Event")
-                                Event:FireServer("shootRifle", "", {v.Parent.HumanoidRootPart})
-                                Event:FireServer("shootRifle", "hit", {v})
-                            end
-                        end
-                    end
-                end
-            end
-        end)
-    end
-end
-
-function ESPS(state)
-    getgenv().Toggle = state
+function ESPS(s)
+    getgenv().Toggle = s
     getgenv().TC = true
 
     local Players = game:GetService("Players")
@@ -294,68 +150,152 @@ function ESPS(state)
     end)
 end
 
-Tabs.Main:Toggle({
-    Title = "Infinite Ammo",
-    Default = false,
-    Callback = InfiniteAmmo
-})
+function KillEnemy(s)
+    if s then
+        spawn(function()
+            while wait(0.1) do
+                local character = LocalPlayer.Character
 
-Tabs.Main:Button({
-    Title = "Kill Enemy",
-    Default = false,
-    Callback = KillEnemy
-})
-
-Tabs.Main:Toggle({
-    Title = "ESP 1",
-    Default = false,
-    Callback = ESP
-})
-
-Tabs.Main:Toggle({
-    Title = "ESP 2",
-    Default = false,
-    Callback = ESPS
-})
-
-Tabs.Teleport:Button({
-    Title = "Japan Lobby",
-    Desc = "Japan Spawn Point",
-    Callback = function()
-    WindUI:Notify({
-            Title = "Notification",
-            Content = "Teleported to Japan Lobby.",
-            Icon = "bell",
-            Duration = 5,
-        })
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-4.103087425231934, -295.5, -36.644065856933594)
+                if character and character:FindFirstChild("Humanoid") then
+                    for _, v in pairs(game.Workspace:GetDescendants()) do
+                        if v:IsA("Humanoid") and v.Parent and v.Parent:FindFirstChild("HumanoidRootPart") then
+                            local targetPlayer = game.Players:GetPlayerFromCharacter(v.Parent)
+                            if targetPlayer and targetPlayer.Team ~= LocalPlayer.Team then
+                                local Event = game:GetService("ReplicatedStorage"):WaitForChild("Event")
+                                Event:FireServer("shootRifle", "", {v.Parent.HumanoidRootPart})
+                                Event:FireServer("shootRifle", "hit", {v})
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+        else
+        print(" turn off ")
     end
-})
+end
 
-Tabs.Teleport:Button({
-    Title = "America Lobby",
-    Desc = "America Spawn Point",
-    Callback = function()
-    WindUI:Notify({
-            Title = "Notification",
-            Content = "Teleported to America Lobby.",
-            Icon = "bell",
-            Duration = 5,
-        })
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(15.000070571899414, -295.5, 46.504608154296875)
+function KillAll()
+    if KillAll then
+        spawn(function()
+            while wait(0.1) do
+                local character = LocalPlayer.Character
+
+                if character and character:FindFirstChild("Humanoid") then
+                    for _, v in pairs(game.Workspace:GetDescendants()) do
+                        if v:IsA("Humanoid") and v.Parent and v.Parent:FindFirstChild("HumanoidRootPart") then
+                            local targetPlayer = game.Players:GetPlayerFromCharacter(v.Parent)
+                            if targetPlayer and targetPlayer.Team ~= LocalPlayer.Team then
+                                local Event = game:GetService("ReplicatedStorage"):WaitForChild("Event")
+                                Event:FireServer("shootRifle", "", {v.Parent.HumanoidRootPart})
+                                Event:FireServer("shootRifle", "hit", {v})
+                            end
+                        end
+                    end
+                end
+            end
+        end)
     end
-})
+end
 
-Tabs.Teleport:Button({
-    Title = "Island A",
-    Desc = "Teleport To A",
-    Callback = function()
-    WindUI:Notify({
-            Title = "Notification",
-            Content = "Teleported to A.",
-            Icon = "bell",
-            Duration = 5,
-        })
+function InfiniteAmmo(s)
+    if s then
+        spawn(function()
+            while wait(3) do
+                local player = game.Players.LocalPlayer
+                if player and player.Character and player.Character:FindFirstChild("Humanoid") then
+                    local oh_get_gc = getgc or false
+                    local oh_is_x_closure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure or false
+                    local oh_get_info = debug.getinfo or getinfo or false
+                    local oh_set_upvalue = debug.setupvalue or setupvalue or setupval or false
+
+                    if not oh_get_gc or not oh_get_info or not oh_set_upvalue then
+                        createNotify("Velonix Hub", "Your Exploit Doesn't Support This")
+                        return
+                    end
+
+                    local function oh_find_function(name)
+                        for _, v in pairs(oh_get_gc()) do
+                            if type(v) == "function" and not oh_is_x_closure(v) then
+                                if oh_get_info(v).name == name then
+                                    return v
+                                end
+                            end
+                        end
+                    end
+
+                    local oh_reload = oh_find_function("reload")
+                    if oh_reload then
+                        local oh_index = 4  -- Adjust this index if needed
+                        local oh_new_value = math.huge
+                        oh_set_upvalue(oh_reload, oh_index, oh_new_value)
+                    else
+                        warn("Reload function not found")
+                    end
+                end
+            end
+        end)
+    end
+end
+
+-- Tabs
+createTab("Home", 1)
+createTab("Main", 2)
+createTab("Player", 3)
+createTab("Teleport", 4)
+createTab("Credits", 5)
+
+-- Buttons/Toggles/Labels
+-- Home Tab
+createLabel("Made By Velonix Studio" 1)
+-- Main Tab
+createButton("Kill All", 2, function()
+    KillAll()
+end)
+createDivider(2)
+createButton("GodMode", 2, function()
+    local player = game.Players.LocalPlayer
+        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local team = player.Team and player.Team.Name or "Unknown" -- Ensure player.Team is valid
+            print("Current Team: " .. team) -- Debug message to check the team name
+            if team == "Japan" then
+                player.Character.HumanoidRootPart.CFrame = CFrame.new(-150.50711059570312, 23.0000057220459, -8160.171875)
+            elseif team == "USA" then
+                player.Character.HumanoidRootPart.CFrame = CFrame.new(-50.992095947265625, 23.0000057220459, 8129.59423828125)
+            else
+                print("Team not recognized or not found")
+            end
+        else
+            print("Player or HumanoidRootPart not found")
+			end 
+end)
+createDivider(2)
+createToggle("Kill Aura", 2, false, function(s)
+    KillEnemy()
+end)
+
+createToggle("Inf Ammo", 2, false, function(s)
+    InfiniteAmmo()
+end)
+
+-- Player Tab
+createToggle("ESP 1", 3, false, function(s)
+    ESP()
+end)
+createDivider(3)
+createToggle("ESP 2", 3, false, function(s)
+    ESPS()
+end)
+
+-- Teleport Tab
+createButton("Japan Lobby", 4, function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-4.103087425231934, -295.5, -36.644065856933594)
+end)
+createDivider(4)
+createButton("America Lobby", 4, function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(15.000070571899414, -295.5, 46.504608154296875)
+end)
+createButton("Teleport A", 4, function()
         -- LocalPlayer setup
         local Players = game:GetService("Players")
         local LocalPlayer = Players.LocalPlayer
@@ -412,19 +352,8 @@ Tabs.Teleport:Button({
                 TeleportToIslandA()
             end
         end)
-    end
-})
-
-Tabs.Teleport:Button({
-    Title = "Island B",
-    Desc = "Teleport To B",
-    Callback = function()
-    WindUI:Notify({
-            Title = "Notification",
-            Content = "Teleported to B.",
-            Icon = "bell",
-            Duration = 5,
-        })
+end)
+createButton("Teleport B", 4, function()
         local Players = game:GetService("Players")
         local LocalPlayer = Players.LocalPlayer
         local Workspace = game:GetService("Workspace")
@@ -474,19 +403,8 @@ Tabs.Teleport:Button({
                 TeleportToIslandB()
             end
         end)
-    end
-})
-
-Tabs.Teleport:Button({
-    Title = "Island C",
-    Desc = "Teleport To C",
-    Callback = function()
-    WindUI:Notify({
-            Title = "Notification",
-            Content = "Teleported To C.",
-            Icon = "bell",
-            Duration = 5,
-        })
+end)
+createButton("Teleport C", 4, function()
         local Players = game:GetService("Players")
         local LocalPlayer = Players.LocalPlayer
         local Workspace = game:GetService("Workspace")
@@ -532,298 +450,25 @@ Tabs.Teleport:Button({
         if IslandPositions.IslandC.X then
             Character.HumanoidRootPart.CFrame = CFrame.new(IslandPositions.IslandC.X, IslandPositions.IslandC.Y, IslandPositions.IslandC.Z)
         end
-    end
-})
+end)
 
-Tabs.Teleport:Button({
-    Title = "America Harbour",
-    Desc = "Teleport To America",
-    Callback = function()
-       WindUI:Notify({
-    Title = "Notification",
-    Content = "Teleported To America",
-    Icon = "bell",
-    Duration = 5,})
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-50.992095947265625, 23.0000057220459, 8129.59423828125)
-    end
-})
+createButton("Japan Lobby", 4, function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-150.50711059570312, 23.0000057220459, -8160.171875)
+end)
+createDivider(4)
+createButton("America Lobby", 4, function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-50.992095947265625, 23.0000057220459, 8129.59423828125)
+end)
 
-Tabs.Teleport:Button({
-    Title = "Japan Harbour",
-    Desc = "Teleport To Japan",
-    Callback = function()
-        WindUI:Notify({
-        Title = "Notification",
-        Content = "Teleported To Japan",
-        Icon = "bell",
-        Duration = 5,})
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-150.50711059570312, 23.0000057220459, -8160.171875)
-    end
-})
+-- Credits Tab
+createLabel("-- Developers" 5)
+createLabel("C9_1234 - Owner" 5)
+createLabel("GoodGamerYTbro - Co-Owner" 5)
+createLabel("Velonix Team - All Contributers" 5)
+-- Settings
+createSettingButton("Discord", function()
+    setclipboard("https://discord.gg/SXuNngnYPT")
+    createNotify("Discord", "Copied Successfully!")
+end)
 
-             --[[ PLAYER TAB ]]--
----------------->>>>>>>>>>>><<<<<<<<<<<<<<-----------------
-
-
-Tabs.Player:Button({
-    Title = "GodMode",
-    Desc = "Gives you godmode (use in lobby)",
-    Callback = function()
-    local player = game.Players.LocalPlayer
-        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local team = player.Team and player.Team.Name or "Unknown" -- Ensure player.Team is valid
-            print("Current Team: " .. team) -- Debug message to check the team name
-            if team == "Japan" then
-                player.Character.HumanoidRootPart.CFrame = CFrame.new(-150.50711059570312, 23.0000057220459, -8160.171875)
-            elseif team == "USA" then
-                player.Character.HumanoidRootPart.CFrame = CFrame.new(-50.992095947265625, 23.0000057220459, 8129.59423828125)
-            else
-                print("Team not recognized or not found")
-            end
-        else
-            print("Player or HumanoidRootPart not found")
-			end 
-    end
-})
-
-Tabs.Player:Button({
-    Title = "Respawn",
-    Desc = "Respawn Back Where Died",
-    Locked = true,
-})
-
-Tabs.Player:Button({
-    Title = "Reset",
-    Desc = "Refresh your character",
-    Locked = true,
-})
-
-Tabs.Player:Button({
-    Title = "Inf Jump",
-    Desc = "Gives you Infinity Jump",
-    Locked = true,
-})
-
-Tabs.Player:Button({
-    Title = "WalkSpeed",
-    Desc = "Gives you 50% WalkSpeed",
-    Locked = true,
-})
-
-Tabs.Player:Button({
-    Title = "Jump Power",
-    Desc = "Gives you 50% Jump Power",
-    Locked = true,
-})
-
-Tabs.Credits:Button({
-    Title = "Made By itzC9",
-    Desc = "Discord: ug32#0000",
-    Locked = true,
-})
-
-
-WindUI:Notify({
-    Title = "Notification",
-    Content = "Velonix Hub Loaded!",
-    Icon = "bell",
-    Duration = 5,
-})
-
--- Configuration
-
-
-local HttpService = game:GetService("HttpService")
-
-local folderPath = "Velonix"
-makefolder(folderPath)
-
-local function SaveFile(fileName, data)
-    local filePath = folderPath .. "/" .. fileName .. ".json"
-    local jsonData = HttpService:JSONEncode(data)
-    writefile(filePath, jsonData)
-end
-
-local function LoadFile(fileName)
-    local filePath = folderPath .. "/" .. fileName .. ".json"
-    if isfile(filePath) then
-        local jsonData = readfile(filePath)
-        return HttpService:JSONDecode(jsonData)
-    end
-end
-
-local function ListFiles()
-    local files = {}
-    for _, file in ipairs(listfiles(folderPath)) do
-        local fileName = file:match("([^/]+)%.json$")
-        if fileName then
-            table.insert(files, fileName)
-        end
-    end
-    return files
-end
-
-Tabs.WindowTab:Section({ Title = "Window" })
-
-local themeValues = {}
-for name, _ in pairs(WindUI:GetThemes()) do
-    table.insert(themeValues, name)
-end
-
-local themeDropdown = Tabs.WindowTab:Dropdown({
-    Title = "Select Theme",
-    Multi = false,
-    AllowNone = false,
-    Value = nil,
-    Values = themeValues,
-    Callback = function(theme)
-        WindUI:SetTheme(theme)
-    end
-})
-themeDropdown:Select(WindUI:GetCurrentTheme())
-
-local ToggleTransparency = Tabs.WindowTab:Toggle({
-    Title = "Toggle Window Transparency",
-    Callback = function(e)
-        Window:ToggleTransparency(e)
-    end,
-    Value = WindUI:GetTransparency()
-})
-
-Tabs.WindowTab:Section({ Title = "Save" })
-
-local fileNameInput = ""
-Tabs.WindowTab:Input({
-    Title = "Write File Name",
-    PlaceholderText = "Enter file name",
-    Callback = function(text)
-        fileNameInput = text
-    end
-})
-
-Tabs.WindowTab:Button({
-    Title = "Save File",
-    Callback = function()
-        if fileNameInput ~= "" then
-            SaveFile(fileNameInput, { Transparent = WindUI:GetTransparency(), Theme = WindUI:GetCurrentTheme() })
-        end
-    end
-})
-
-Tabs.WindowTab:Section({ Title = "Load" })
-
-local filesDropdown
-local files = ListFiles()
-
-filesDropdown = Tabs.WindowTab:Dropdown({
-    Title = "Select File",
-    Multi = false,
-    AllowNone = true,
-    Values = files,
-    Callback = function(selectedFile)
-        fileNameInput = selectedFile
-    end
-})
-
-Tabs.WindowTab:Button({
-    Title = "Load File",
-    Callback = function()
-        if fileNameInput ~= "" then
-            local data = LoadFile(fileNameInput)
-            if data then
-                WindUI:Notify({
-                    Title = "File Loaded",
-                    Content = "Loaded data: " .. HttpService:JSONEncode(data),
-                    Duration = 5,
-                })
-                if data.Transparent then 
-                    Window:ToggleTransparency(data.Transparent)
-                    ToggleTransparency:SetValue(data.Transparent)
-                end
-                if data.Theme then WindUI:SetTheme(data.Theme) end
-            end
-        end
-    end
-})
-
-Tabs.WindowTab:Button({
-    Title = "Overwrite File",
-    Callback = function()
-        if fileNameInput ~= "" then
-            SaveFile(fileNameInput, { Transparent = WindUI:GetTransparency(), Theme = WindUI:GetCurrentTheme() })
-        end
-    end
-})
-
-Tabs.WindowTab:Button({
-    Title = "Refresh List",
-    Callback = function()
-        filesDropdown:Refresh(ListFiles())
-    end
-})
-
-local currentThemeName = WindUI:GetCurrentTheme()
-local themes = WindUI:GetThemes()
-
-local ThemeAccent = themes[currentThemeName].Accent
-local ThemeOutline = themes[currentThemeName].Outline
-local ThemeText = themes[currentThemeName].Text
-local ThemePlaceholderText = themes[currentThemeName].PlaceholderText
-
-function updateTheme()
-    WindUI:AddTheme({
-        Name = currentThemeName,
-        Accent = ThemeAccent,
-        Outline = ThemeOutline,
-        Text = ThemeText,
-        PlaceholderText = ThemePlaceholderText
-    })
-    WindUI:SetTheme(currentThemeName)
-end
-
-local CreateInput = Tabs.ThemeTab:Input({
-    Title = "Theme Name",
-    Value = currentThemeName,
-    Callback = function(name)
-        currentThemeName = name
-    end
-})
-
-Tabs.ThemeTab:Colorpicker({
-    Title = "Background Color",
-    Default = Color3.fromHex(ThemeAccent),
-    Callback = function(color)
-        ThemeAccent = color:ToHex()
-    end
-})
-
-Tabs.ThemeTab:Colorpicker({
-    Title = "Outline Color",
-    Default = Color3.fromHex(ThemeOutline),
-    Callback = function(color)
-        ThemeOutline = color:ToHex()
-    end
-})
-
-Tabs.ThemeTab:Colorpicker({
-    Title = "Text Color",
-    Default = Color3.fromHex(ThemeText),
-    Callback = function(color)
-        ThemeText = color:ToHex()
-    end
-})
-
-Tabs.ThemeTab:Colorpicker({
-    Title = "Placeholder Text Color",
-    Default = Color3.fromHex(ThemePlaceholderText),
-    Callback = function(color)
-        ThemePlaceholderText = color:ToHex()
-    end
-})
-
-Tabs.ThemeTab:Button({
-    Title = "Update Theme",
-    Callback = function()
-        updateTheme()
-    end
-})
+createNotify("Title","Description")

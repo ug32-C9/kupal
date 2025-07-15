@@ -213,7 +213,7 @@ end
 --// === UI INIT === --
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ug32-C9/Velonix-UI-Library/refs/heads/main/Main3.lua"))()
 
-createWindow("Velonix-GaG", 28)
+createWindow("Velonix Hub - GaG", 28)
 createLogo(121332021347640)
 
 --// Home Tab

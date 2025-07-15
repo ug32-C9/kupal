@@ -116,7 +116,7 @@ local function KillAll()
 end
 
 -- Windows
-createWindow("Velonix Hub", 28)
+createWindow("Velonix Hub - FTF", 28)
 createLogo(121332021347640)
 
 -- Tabs
