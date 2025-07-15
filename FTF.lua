@@ -253,4 +253,9 @@ createSettingButton("Small-Server", function()
     until found or not cursor
 end)
 
+createSettingButton("Discord", function()
+    setclipboard("https://discord.gg/SXuNngnYPT")
+    createNotify("Discord", "Copied Successfully!")
+end)
+
 createNotify("Flee The Facility:", "Velonix Hub Loaded Successfully!")

@@ -248,5 +248,9 @@ createSettingButton("Low-Grahics", function()
 		terrain.WaterWaveSize, terrain.WaterWaveSpeed, terrain.WaterReflectance, terrain.WaterTransparency = 0, 0, 0, 0
 	end
 end)
+createSettingButton("Discord", function()
+    setclipboard("https://discord.gg/SXuNngnYPT")
+    createNotify("Discord", "Copied Successfully!")
+end)
 
 createNotify("The Strongest Battleground:", "Velonix Hub Loaded Successfully!")

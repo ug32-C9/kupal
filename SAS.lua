@@ -89,4 +89,9 @@ createSettingButton("No Effects", function()
     end
 end)
 
+createSettingButton("Discord", function()
+    setclipboard("https://discord.gg/SXuNngnYPT")
+    createNotify("Discord", "Copied Successfully!")
+end)
+
 createNotify("Steal a Sword:", "Velonix Hub Loaded Successfully!")

@@ -203,5 +203,9 @@ createSettingButton("Low-Graphics", function()
 		terrain.WaterTransparency = 0
 	end
 end)
+createSettingButton("Discord", function()
+    setclipboard("https://discord.gg/SXuNngnYPT")
+    createNotify("Discord", "Copied Successfully!")
+end)
 
 createNotify("Universal Hub:", "Velonix Hub Loaded Successfully!")
