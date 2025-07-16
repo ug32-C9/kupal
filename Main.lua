@@ -164,12 +164,8 @@ spawn(function()
         warn("API response error:", res.StatusCode)
     end
 end)
-
--- Load Admin
-task.delay(2, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/Admin.lua"))()
-end)
-
+wait(1)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/Admin.lua"))()
 -- Developer Notification
 local DevRoles = {
     [1489467751] = "C9_1234",
