@@ -21,7 +21,7 @@ local function bypassAntiCheat()
 end
 
 createWindow("Velonix Hub - Ink Game", 28)
-createLogo(12345678)
+createLogo(121332021347640)
 createNotify("Velonix Hub", "Anti-Cheat bypassed! Teleport freely")
 bypassAntiCheat()
 
