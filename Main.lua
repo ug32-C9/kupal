@@ -25,6 +25,7 @@ local LOADER_SCRIPTS = {
     ["🔨 Flee The Facility"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/FTF.lua",
     ["💂 Ink Game"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/IG.lua",  
     ["🚢 Naval Warfare"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/NW.lua",
+    ["🪖 Underground War"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/UW.lua",
     ["🌐 Universal Script"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/UNIV.lua"
 }
 
