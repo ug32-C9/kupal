@@ -1,22 +1,18 @@
---// Silent Command Control v2.5.1 - Script User Scoped Only
+-- Silent Command Control v2.6 - GLOBAL NOTIFY READY
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Debris = game:GetService("Debris")
-local TeleportService = game:GetService("TeleportService")
 local StarterGui = game:GetService("StarterGui")
+local TeleportService = game:GetService("TeleportService")
 local RunService = game:GetService("RunService")
 
 local LocalPlayer = Players.LocalPlayer
 local Character = function() return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait() end
 
--- Whitelisted admins who can fire commands
 local WHITELIST = {
     C9_1234 = true,
-    mommytoldimagoodboy = true,
-    AdminUser1 = false
+    mommytoldimagoodboy = true
 }
 
--- RemoteEvent Setup
 local REMOTE_NAME = "SilentCommand_Event_C9"
 local Remote = ReplicatedStorage:FindFirstChild(REMOTE_NAME)
 if not Remote or not Remote:IsA("RemoteEvent") then
@@ -24,10 +20,8 @@ if not Remote or not Remote:IsA("RemoteEvent") then
     Remote.Name = REMOTE_NAME
 end
 
--- Users with the script loaded
 local clientList = {[LocalPlayer.Name] = true}
 
--- Helpers
 local function findUser(name)
     name = name:lower()
     for _, p in ipairs(Players:GetPlayers()) do
@@ -43,10 +37,8 @@ local function getRandomClient()
     return #t > 0 and t[math.random(1, #t)] or nil
 end
 
--- ESP and spin control
 local espRunning = false
 
--- Remote Event Listener (Scoped Commands)
 Remote.OnClientEvent:Connect(function(sender, cmd, payload)
     if sender == LocalPlayer then return end
     if not WHITELIST[sender.Name] then return end
@@ -106,7 +98,6 @@ Remote.OnClientEvent:Connect(function(sender, cmd, payload)
     end
 end)
 
--- Command Chat Handler (Sender-side)
 LocalPlayer.Chatted:Connect(function(msg)
     if not WHITELIST[LocalPlayer.Name] then return end
 
@@ -119,10 +110,17 @@ LocalPlayer.Chatted:Connect(function(msg)
 
     if cmd == "notify" then
         local message = table.concat(parts, " ", 2)
+
+        -- Local game broadcast
         for _, p in ipairs(Players:GetPlayers()) do
             if clientList[p.Name] then
                 Remote:FireClient(p, LocalPlayer, "notify", message)
             end
+        end
+
+        -- Global cross-server notify
+        if _G.SendGlobalNotify then
+            _G.SendGlobalNotify(message)
         end
 
     elseif cmd == "jpg" then
@@ -148,10 +146,7 @@ LocalPlayer.Chatted:Connect(function(msg)
         end)
 
     elseif cmd == "jp" and arg then
-        local target = findUser(arg)
-        if target and target.UserId then
-            TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
-        end
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
 
     else
         local targets = {}
@@ -174,7 +169,6 @@ LocalPlayer.Chatted:Connect(function(msg)
     end
 end)
 
--- Add new player to clientList if script user
 Players.PlayerAdded:Connect(function(p)
     if p ~= LocalPlayer then
         clientList[p.Name] = true

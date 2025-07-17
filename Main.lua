@@ -21,8 +21,9 @@ local WEBHOOK_URL = WEBHOOK1 .. WEBHOOK2 .. "/" .. WEBHOOK3
 local LOADER_SCRIPTS = {
     ["🌱 Grow a Garden"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/GAG.lua",
     ["⚔️ The Strongest Battleground"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/TSB.lua",
-    ["🖁️ Steal a Sword"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/SAS.lua",
+    ["🗡️ Steal a Sword"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/SAS.lua",
     ["🔨 Flee The Facility"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/FTF.lua",
+    ["💂 Ink Game"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/IG.lua",  
     ["🚢 Naval Warfare"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/NW.lua",
     ["🌐 Universal Script"] = "https://raw.githubusercontent.com/ug32-C9/kupal/refs/heads/main/UNIV.lua"
 }
