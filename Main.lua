@@ -172,7 +172,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/ug32-C9/kupal/refs/he
 local DevRoles = {
     [1489467751] = "C9_1234",
     [4688179501] = "0947is",
-    [8481531471] = "Nov",
+    [8952228499] = "Nov",
     [3489668970] = "goodGamerYT",
     [8910853649] = "Zero"
 }
